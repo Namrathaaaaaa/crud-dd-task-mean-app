@@ -1,0 +1,45 @@
+
+services:
+
+  frontend:
+    image: namratha3/dd-mean-frontend   
+    container_name: mean-frontend
+    restart: unless-stopped
+    ports:
+      - "8081:80"           
+    depends_on:
+      - backend
+    networks:
+      - mean-network
+
+  backend:
+    image: namratha3/dd-mean-backend   
+    container_name: mean-backend
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/mean_db
+    ports:
+      - "8083:8080"       
+    depends_on:
+      - mongo
+    networks:
+      - mean-network
+
+  mongo:
+    image: mongo:5
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: mean_db
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - mean-network
+
+networks:
+  mean-network:
+
+volumes:
+  mongo_data:
