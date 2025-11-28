@@ -80,7 +80,7 @@ pipeline {
     }
 
     tools {
-        nodejs 'node21'
+        nodejs 'node18'
     }
 
     environment {
