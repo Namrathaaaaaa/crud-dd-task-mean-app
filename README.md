@@ -34,7 +34,45 @@ Use this README to run locally, build images, and follow the CI/CD deployment fl
 - Docker & Docker Compose
 - Jenkins (CI/CD), Slack notifications, AWS EC2
 
+
+
 ---
+
+## 📸 Screenshots & Demo Video
+
+Below are the images you provided — they are embedded directly from the supplied URLs so they render in this README. Replace these with local files under `./docs/` if you prefer to keep assets in-repo.
+
+
+### Screenshots 
+
+1. Jenkins — CI/CD pipeline console
+
+![Jenkins - Pipeline Console](https://github.com/user-attachments/assets/f55b3b03-1357-42b1-9497-bb4677aa0ea0)
+
+2. Docker image build & push logs
+
+![Docker Build & Push](https://github.com/user-attachments/assets/c2541694-a866-4a88-a05b-6ddcd0c7a2c6)
+
+3. Application UI — Home
+
+![App UI - Home](https://github.com/user-attachments/assets/f3170d65-6962-4bc8-9a2e-8d8a3bfa4364)
+
+4. Application UI — Details/List view
+
+![App UI - Details](https://github.com/user-attachments/assets/e7d45741-3270-41cd-b3e7-2b3df51640a3)
+
+5. Nginx / infrastructure diagram or setup screenshot
+
+![Nginx / Infra](https://github.com/user-attachments/assets/a5813cae-2f9c-48a8-908e-477fc615304f)
+
+6. Deployment logs / status
+
+![Deployment Logs](https://github.com/user-attachments/assets/d330c8d7-47cf-4a90-abfb-4114bf87fb41)
+
+If you want the images copied into the repository under `./docs/screenshots/`, I can create that folder and add placeholder files (or download and commit the exact images). Which do you prefer — embed remote URLs (current) or store them in-repo under `./docs/`?
+
+---
+
 
 ## 📂 Folder Structure (high level)
 
@@ -97,40 +135,6 @@ Manual setup checklist (create a small `docs/aws-setup.md` if you want these ste
 - Ensure the Jenkins SSH key (`aws-ssh-key`) is authorized for the EC2 user.
 - Verify Docker can be run by the deployment user (add to `docker` group or use `sudo`).
 
----
-
-## 📸 Screenshots & Demo Video
-
-Below are the images you provided — they are embedded directly from the supplied URLs so they render in this README. Replace these with local files under `./docs/` if you prefer to keep assets in-repo.
-
-
-### Screenshots 
-
-1. Jenkins — CI/CD pipeline console
-
-![Jenkins - Pipeline Console](https://github.com/user-attachments/assets/f55b3b03-1357-42b1-9497-bb4677aa0ea0)
-
-2. Docker image build & push logs
-
-![Docker Build & Push](https://github.com/user-attachments/assets/c2541694-a866-4a88-a05b-6ddcd0c7a2c6)
-
-3. Application UI — Home
-
-![App UI - Home](https://github.com/user-attachments/assets/f3170d65-6962-4bc8-9a2e-8d8a3bfa4364)
-
-4. Application UI — Details/List view
-
-![App UI - Details](https://github.com/user-attachments/assets/e7d45741-3270-41cd-b3e7-2b3df51640a3)
-
-5. Nginx / infrastructure diagram or setup screenshot
-
-![Nginx / Infra](https://github.com/user-attachments/assets/a5813cae-2f9c-48a8-908e-477fc615304f)
-
-6. Deployment logs / status
-
-![Deployment Logs](https://github.com/user-attachments/assets/d330c8d7-47cf-4a90-abfb-4114bf87fb41)
-
-If you want the images copied into the repository under `./docs/screenshots/`, I can create that folder and add placeholder files (or download and commit the exact images). Which do you prefer — embed remote URLs (current) or store them in-repo under `./docs/`?
 
 ---
 
@@ -150,5 +154,4 @@ If you want the images copied into the repository under `./docs/screenshots/`, I
 - Replace `http://65.2.168.127/app` with your live URL and add screenshots/video to `./docs/` to make this portfolio-ready.
 - Want me to create `./docs/` and add image placeholders (empty files) or convert the Jenkins pipeline to GitHub Actions? I can do that next.
 
-Good luck — ship it! 🚀
-restart: unless-stopped
+- namratha
