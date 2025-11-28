@@ -8,11 +8,12 @@ pipeline {
     tools {
         nodejs 'node18'
     }
+
     environment {
         FRONTEND_IMAGE = "namratha3/dd-mean-frontend"
         BACKEND_IMAGE  = "namratha3/dd-mean-backend"
-        AWS_USER       = "ubuntu"                      
-        AWS_IP         = "65.2.168.127"               
+        AWS_USER       = "ubuntu"
+        AWS_IP         = "65.2.168.127"
         SLACK_WEBHOOK  = credentials('slack-cred')
     }
 
@@ -85,32 +86,49 @@ pipeline {
             }
         }
 
-
         stage('Deploy to AWS EC2') {
             steps {
-                withCredentials([sshUserPrivateKey(
-                    credentialsId: 'aws-ssh-key',          
-                    keyFileVariable: 'SSH_KEY'
-                )]) {
+                script {
+                    try {
+                        withCredentials([
+                            sshUserPrivateKey(
+                                credentialsId: 'aws-ssh-key',
+                                keyFileVariable: 'SSH_KEY'
+                            )
+                        ]) {
 
-                    sh """
-                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${AWS_USER}@${AWS_IP} '
-                        cd /home/ubuntu/crud-dd-task-mean-app &&
+                            sh """
+                            ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no ${AWS_USER}@${AWS_IP} '
+                                set -e
+                                cd /home/ubuntu/crud-dd-task-mean-app
 
-                        sed -i "s|${FRONTEND_IMAGE}:.*|${FRONTEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
-                        sed -i "s|${BACKEND_IMAGE}:.*|${BACKEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
+                                sed -i "s|${FRONTEND_IMAGE}:.*|${FRONTEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml
+                                sed -i "s|${BACKEND_IMAGE}:.*|${BACKEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml
 
-                        docker compose pull &&
-                        docker compose down &&
-                        docker compose up -d
-                    '
-                    """
+                                docker compose pull
+                                docker compose down || true
+                                docker compose up -d
+                            '
+                            """
 
-                    sh """
-                    curl -X POST -H 'Content-type: application/json' \
-                    --data '{"text": "🚀 Deployment Successful on AWS EC2 (${AWS_IP})"}' \
-                    '${SLACK_WEBHOOK}'
-                    """
+                            // SUCCESS SLACK MESSAGE
+                            sh """
+                            curl -X POST -H 'Content-type: application/json' \
+                            --data '{"text": "🚀 Deployment Successful on AWS EC2 (${AWS_IP})"}' \
+                            '${SLACK_WEBHOOK}'
+                            """
+                        }
+                    } catch (err) {
+
+                        // FAILURE SLACK MESSAGE
+                        sh """
+                        curl -X POST -H 'Content-type: application/json' \
+                        --data '{"text": "❌ Deployment Failed on AWS EC2"}' \
+                        '${SLACK_WEBHOOK}'
+                        """
+
+                        error("Deployment stage failed: ${err}")
+                    }
                 }
             }
         }
