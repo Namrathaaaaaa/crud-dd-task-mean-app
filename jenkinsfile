@@ -71,7 +71,6 @@ pipeline {
                 """
             }
         }
-
         stage('Frontend Image Build') {
             steps {
                 sh """
