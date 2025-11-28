@@ -12,11 +12,13 @@ pipeline {
     environment {
         FRONTEND_IMAGE = "namratha3/dd-mean-frontend"
         BACKEND_IMAGE  = "namratha3/dd-mean-backend"
-        CONTABO_IP     = "207.180.223.198"
+        AWS_USER       = "ubuntu"                      
+        AWS_IP         = "3.110.45.221"               
         SLACK_WEBHOOK  = credentials('slack-cred')
     }
 
     stages {
+
         stage('Notify Start') {
             steps {
                 sh """
@@ -40,12 +42,11 @@ pipeline {
 
                 sh """
                 curl -X POST -H 'Content-type: application/json' \
-                --data '{"text": "🔖 New Docker Tag: ${IMAGE_TAG}"}' \
+                --data '{"text": "🔖 New Docker Tag Created: ${IMAGE_TAG}"}' \
                 '${SLACK_WEBHOOK}'
                 """
             }
         }
-
 
         stage('Docker Login') {
             steps {
@@ -59,56 +60,57 @@ pipeline {
             }
         }
 
-        stage('Backend Image Build') {
+        stage('Build Backend Image') {
             steps {
                 sh """
-                    cd backend
-                    docker buildx build \
-                        --platform linux/amd64 \
-                        -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
-                        -t ${BACKEND_IMAGE}:latest \
-                        --push .
-                """
-            }
-        }
-        stage('Frontend Image Build') {
-            steps {
-                sh """
-                    cd frontend
-                    docker buildx build \
-                        --platform linux/amd64 \
-                        -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
-                        -t ${FRONTEND_IMAGE}:latest \
-                        --push .
+                cd backend
+                docker buildx build \
+                    --platform linux/amd64 \
+                    -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
+                    -t ${BACKEND_IMAGE}:latest \
+                    --push .
                 """
             }
         }
 
-        stage('Update Compose & Deploy') {
+        stage('Build Frontend Image') {
             steps {
+                sh """
+                cd frontend
+                docker buildx build \
+                    --platform linux/amd64 \
+                    -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
+                    -t ${FRONTEND_IMAGE}:latest \
+                    --push .
+                """
+            }
+        }
 
-                withCredentials([usernamePassword(
-                    credentialsId: 'contabo-pass',         
-                    usernameVariable: 'SERVER_USER',
-                    passwordVariable: 'SERVER_PASS'
+
+        stage('Deploy to AWS EC2') {
+            steps {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'aws-ssh-key',          
+                    keyFileVariable: 'SSH_KEY'
                 )]) {
 
                     sh """
-                    sshpass -p "$SERVER_PASS" ssh \
-                        -o StrictHostKeyChecking=no \
-                        $SERVER_USER@${CONTABO_IP} '
-                            cd /root/projects/crud-dd-task-mean-app &&
-                            sed -i "s|${FRONTEND_IMAGE}:.*|${FRONTEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
-                            sed -i "s|${BACKEND_IMAGE}:.*|${BACKEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
-                            docker compose pull &&
-                            docker compose down &&
-                            docker compose up -d
-                        '
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${AWS_USER}@${AWS_IP} '
+                        cd /home/ubuntu/projects/crud-dd-task-mean-app &&
+
+                        # Update docker-compose with new image tags
+                        sed -i "s|${FRONTEND_IMAGE}:.*|${FRONTEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
+                        sed -i "s|${BACKEND_IMAGE}:.*|${BACKEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
+
+                        docker compose pull &&
+                        docker compose down &&
+                        docker compose up -d
+                    '
                     """
 
                     sh """
                     curl -X POST -H 'Content-type: application/json' \
-                    --data '{"text": "🚀 Deployment Successful on Contabo (207.180.223.198)"}' \
+                    --data '{"text": "🚀 Deployment Successful on AWS EC2 (${AWS_IP})"}' \
                     '${SLACK_WEBHOOK}'
                     """
                 }
