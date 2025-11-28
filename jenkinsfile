@@ -9,6 +9,7 @@ pipeline {
         nodejs 'node18'
     }
 
+
     environment {
         FRONTEND_IMAGE = "namratha3/dd-mean-frontend"
         BACKEND_IMAGE  = "namratha3/dd-mean-backend"
@@ -131,16 +132,6 @@ pipeline {
                     }
                 }
             }
-        }
-    }
-
-    post {
-        failure {
-            sh """
-            curl -X POST -H 'Content-type: application/json' \
-            --data '{"text": "❌ Pipeline Failed!"}' \
-            '${SLACK_WEBHOOK}'
-            """
         }
     }
 }
