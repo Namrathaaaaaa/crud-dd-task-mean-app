@@ -1,6 +1,7 @@
 # 🚀 CRUD-DD Task — MEAN App
 
 **Video URL:** : https://www.loom.com/share/52869ac8e0f649bb9609c088e8cb8d21
+- Refer this video to view the full deployment 
 
 ## 🚀 Project Overview
 
