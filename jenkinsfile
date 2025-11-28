@@ -97,7 +97,7 @@ pipeline {
                     sshpass -p "$SERVER_PASS" ssh \
                         -o StrictHostKeyChecking=no \
                         $SERVER_USER@${CONTABO_IP} '
-                            cd /root/crud-dd-task-mean-app &&
+                            cd /root/projects/crud-dd-task-mean-app &&
                             sed -i "s|${FRONTEND_IMAGE}:.*|${FRONTEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
                             sed -i "s|${BACKEND_IMAGE}:.*|${BACKEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
                             docker compose pull &&
