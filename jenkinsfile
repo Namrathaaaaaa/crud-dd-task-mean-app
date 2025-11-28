@@ -13,7 +13,7 @@ pipeline {
         FRONTEND_IMAGE = "namratha3/dd-mean-frontend"
         BACKEND_IMAGE  = "namratha3/dd-mean-backend"
         AWS_USER       = "ubuntu"                      
-        AWS_IP         = "3.110.45.221"               
+        AWS_IP         = "65.2.168.127"               
         SLACK_WEBHOOK  = credentials('slack-cred')
     }
 
@@ -97,7 +97,7 @@ pipeline {
                     sh """
                     ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${AWS_USER}@${AWS_IP} '
                         /home/ubuntu/crud-dd-task-mean-app &&
-                        
+
                         sed -i "s|${FRONTEND_IMAGE}:.*|${FRONTEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
                         sed -i "s|${BACKEND_IMAGE}:.*|${BACKEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
 
