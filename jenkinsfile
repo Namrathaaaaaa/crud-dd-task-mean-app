@@ -1,0 +1,198 @@
+// pipeline {
+//     agent any
+
+//     triggers{
+//         githubPush()
+//     }
+    
+//     tools {
+//         nodejs 'node21'
+//     }
+
+//     stages {
+//         stage('Git Checkout') {
+//             steps {
+//                 git branch: 'main', url: 'https://github.com/Namrathaaaaaa/crud-dd-task-mean-app.git'
+//             }
+//         }
+//         stage('Docker Login') {
+//             steps {
+//                  withCredentials([usernamePassword(
+//                     credentialsId: 'docker-cred',
+//                     usernameVariable: 'DOCKER_USER',
+//                     passwordVariable: 'DOCKER_PASS'
+//                 )]) {
+//                     sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+//                 }
+//             }
+//         }
+//         stage('Backend Image Build') {
+//             steps {
+//                 sh '''
+//                     cd backend
+//                     docker buildx build \
+//                     --platform linux/amd64 \
+//                     -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
+//                     --push .
+//                 '''
+//             }
+//         }
+//         stage('Frontend Image Build'){
+//             steps{
+//                 sh '''
+//                     cd frontend
+//                     docker buildx build \
+//                     --platform linux/amd64 \
+//                     -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
+//                     --push .
+//                 '''
+//             }
+//         }
+//         stage('Update Compose & Deploy') {
+//             steps {
+//                 sshagent(['contabo-ssh-key']) {
+//                 sh """
+//                     ssh -o StrictHostKeyChecking=no root@YOUR_CONTABO_IP '
+//                     cd /root/crud-dd-task-mean-app &&
+
+//                     # update docker-compose file with new dynamic tags
+//                     sed -i "s|namratha3/dd-mean-frontend:.*|namratha3/dd-mean-frontend:${IMAGE_TAG}|" docker-compose.yaml
+//                     sed -i "s|namratha3/dd-mean-backend:.*|namratha3/dd-mean-backend:${IMAGE_TAG}|" docker-compose.yaml
+
+//                     docker compose pull
+//                     docker compose down
+//                     docker compose up -d
+//                     '
+//                 """
+//                 }
+//             }
+//         }
+
+//     }
+// }
+
+
+pipeline {
+    agent any
+
+    triggers {
+        githubPush()
+    }
+
+    tools {
+        nodejs 'node21'
+    }
+
+    environment {
+        FRONTEND_IMAGE = "namratha3/dd-mean-frontend"
+        BACKEND_IMAGE  = "namratha3/dd-mean-backend"
+        CONTABO_USER   = "root"
+        CONTABO_IP     = "207.180.223.198"
+        SLACK_WEBHOOK  = credentials('slack-cred')
+    }
+
+    stages {
+
+        stage('Notify Start') {
+            steps {
+                sh """
+                curl -X POST -H 'Content-type: application/json' \
+                --data '{"text": "🚀 Pipeline Started"}' \
+                $SLACK_WEBHOOK
+                """
+            }
+        }
+
+        stage('Git Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Namrathaaaaaa/crud-dd-task-mean-app.git'
+
+                script {
+                    env.IMAGE_TAG = sh(
+                        script: "git rev-parse --short HEAD",
+                        returnStdout: true
+                    ).trim()
+                }
+
+                sh """
+                curl -X POST -H 'Content-type: application/json' \
+                --data '{"text": "New Docker Tag Created: ${IMAGE_TAG}"}' \
+                $SLACK_WEBHOOK
+                """
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-cred',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                }
+            }
+        }
+
+        stage('Backend Image Build') {
+            steps {
+                sh """
+                    cd backend
+                    docker buildx build \
+                        --platform linux/amd64 \
+                        -t ${BACKEND_IMAGE}:${IMAGE_TAG} \
+                        -t ${BACKEND_IMAGE}:latest \
+                        --push .
+                """
+            }
+        }
+
+        stage('Frontend Image Build') {
+            steps {
+                sh """
+                    cd frontend
+                    docker buildx build \
+                        --platform linux/amd64 \
+                        -t ${FRONTEND_IMAGE}:${IMAGE_TAG} \
+                        -t ${FRONTEND_IMAGE}:latest \
+                        --push .
+                """
+            }
+        }
+
+        stage('Update Compose & Deploy') {
+            steps {
+                sshagent(['contabo-ssh-key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no ${CONTABO_USER}@${CONTABO_IP} '
+                        cd /root/crud-dd-task-mean-app &&
+
+                        sed -i "s|$FRONTEND_IMAGE:.*|$FRONTEND_IMAGE:${IMAGE_TAG}|" docker-compose.yaml
+                        sed -i "s|$BACKEND_IMAGE:.*|$BACKEND_IMAGE:${IMAGE_TAG}|" docker-compose.yaml
+
+                        docker compose pull
+                        docker compose down
+                        docker compose up -d
+                    '
+                    """
+
+                    sh """
+                    curl -X POST -H 'Content-type: application/json' \
+                    --data '{"text": "🚀 Deployment Successful on Contabo"}' \
+                    $SLACK_WEBHOOK
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            sh """
+            curl -X POST -H 'Content-type: application/json' \
+            --data '{"text": "❌ Pipeline Failed!"}' \
+            $SLACK_WEBHOOK
+            """
+        }
+    }
+}
