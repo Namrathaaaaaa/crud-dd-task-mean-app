@@ -162,18 +162,21 @@ pipeline {
 
         stage('Update Compose & Deploy') {
             steps {
-                sshagent(['contabo-ssh-key']) {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'contabo-ssh-key',
+                    keyFileVariable: 'SSH_KEY'
+                )]) {
+
                     sh """
-                    ssh -o StrictHostKeyChecking=no ${CONTABO_USER}@${CONTABO_IP} '
+                        ssh -o StrictHostKeyChecking=no \
+                        -i $SSH_KEY root@207.180.223.198 '
                         cd /root/crud-dd-task-mean-app &&
-
-                        sed -i "s|$FRONTEND_IMAGE:.*|$FRONTEND_IMAGE:${IMAGE_TAG}|" docker-compose.yaml
-                        sed -i "s|$BACKEND_IMAGE:.*|$BACKEND_IMAGE:${IMAGE_TAG}|" docker-compose.yaml
-
-                        docker compose pull
-                        docker compose down
+                        sed -i "s|$FRONTEND_IMAGE:.*|$FRONTEND_IMAGE:${IMAGE_TAG}|" docker-compose.yaml &&
+                        sed -i "s|$BACKEND_IMAGE:.*|$BACKEND_IMAGE:${IMAGE_TAG}|" docker-compose.yaml &&
+                        docker compose pull &&
+                        docker compose down &&
                         docker compose up -d
-                    '
+                        '
                     """
 
                     sh """
