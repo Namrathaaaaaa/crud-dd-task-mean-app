@@ -1,7 +1,6 @@
 # 🚀 CRUD-DD Task — MEAN App
 
 **Video URL:** : https://www.loom.com/share/52869ac8e0f649bb9609c088e8cb8d21
-- Refer this video to view the full deployment 
 
 ## 🚀 Project Overview
 
@@ -23,7 +22,6 @@ Use this README to run locally, build images, and follow the CI/CD deployment fl
 - Docker Compose: [./docker-compose.yaml](./docker-compose.yaml)
 - Nginx config: [./nginx.conf](./nginx.conf)
 - Jenkins pipeline: [./jenkinsfile](./jenkinsfile)
-
 
 ---
 
@@ -101,17 +99,38 @@ Manual setup checklist (create a small `docs/aws-setup.md` if you want these ste
 
 ---
 
-## 📸 Screenshots & Demo Video (placeholders)
+## 📸 Screenshots & Demo Video
 
-Add your recorded demo video and screenshots into `./docs/` (recommended) and update these links.
+Below are the images you provided — they are embedded directly from the supplied URLs so they render in this README. Replace these with local files under `./docs/` if you prefer to keep assets in-repo.
 
-- Demo video: `./docs/demo.mp4` — link: [./docs/demo.mp4](./docs/demo.mp4)
-- Jenkins CI screenshot: `./docs/screenshots/jenkins-build.png`
-- Docker build & push logs: `./docs/screenshots/docker-build.png`
-- Deployed UI screenshot: `./docs/screenshots/ui-home.png`
-- Nginx/infrastructure diagram: `./docs/screenshots/nginx-setup.png`
 
-Example Markdown to embed an image (replace path with your screenshot): `![Jenkins build](./docs/screenshots/jenkins-build.png)`
+### Screenshots 
+
+1. Jenkins — CI/CD pipeline console
+
+![Jenkins - Pipeline Console](https://github.com/user-attachments/assets/f55b3b03-1357-42b1-9497-bb4677aa0ea0)
+
+2. Docker image build & push logs
+
+![Docker Build & Push](https://github.com/user-attachments/assets/c2541694-a866-4a88-a05b-6ddcd0c7a2c6)
+
+3. Application UI — Home
+
+![App UI - Home](https://github.com/user-attachments/assets/f3170d65-6962-4bc8-9a2e-8d8a3bfa4364)
+
+4. Application UI — Details/List view
+
+![App UI - Details](https://github.com/user-attachments/assets/e7d45741-3270-41cd-b3e7-2b3df51640a3)
+
+5. Nginx / infrastructure diagram or setup screenshot
+
+![Nginx / Infra](https://github.com/user-attachments/assets/a5813cae-2f9c-48a8-908e-477fc615304f)
+
+6. Deployment logs / status
+
+![Deployment Logs](https://github.com/user-attachments/assets/d330c8d7-47cf-4a90-abfb-4114bf87fb41)
+
+If you want the images copied into the repository under `./docs/screenshots/`, I can create that folder and add placeholder files (or download and commit the exact images). Which do you prefer — embed remote URLs (current) or store them in-repo under `./docs/`?
 
 ---
 
@@ -128,7 +147,7 @@ Example Markdown to embed an image (replace path with your screenshot): `![Jenki
 ## 🏁 Final Notes
 
 - This README intentionally avoids embedding large code blocks — it links to the authoritative files in the repository instead. Click the links at the top of this document to view the exact Dockerfiles, Compose manifest, Nginx config, and Jenkins pipeline.
-- Replace `ADD_YOUR_DEPLOYMENT_URL_HERE` with your live URL and add screenshots/video to `./docs/` to make this portfolio-ready.
+- Replace `http://65.2.168.127/app` with your live URL and add screenshots/video to `./docs/` to make this portfolio-ready.
 - Want me to create `./docs/` and add image placeholders (empty files) or convert the Jenkins pipeline to GitHub Actions? I can do that next.
 
 Good luck — ship it! 🚀
