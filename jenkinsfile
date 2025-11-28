@@ -96,7 +96,7 @@ pipeline {
 
                     sh """
                     ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${AWS_USER}@${AWS_IP} '
-                        /home/ubuntu/crud-dd-task-mean-app &&
+                        cd /home/ubuntu/crud-dd-task-mean-app &&
 
                         sed -i "s|${FRONTEND_IMAGE}:.*|${FRONTEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
                         sed -i "s|${BACKEND_IMAGE}:.*|${BACKEND_IMAGE}:${IMAGE_TAG}|" docker-compose.yaml &&
