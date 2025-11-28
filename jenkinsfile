@@ -8,7 +8,6 @@ pipeline {
     tools {
         nodejs 'node18'
     }
-
     environment {
         FRONTEND_IMAGE = "namratha3/dd-mean-frontend"
         BACKEND_IMAGE  = "namratha3/dd-mean-backend"
